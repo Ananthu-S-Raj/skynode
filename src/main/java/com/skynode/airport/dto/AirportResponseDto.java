@@ -40,6 +40,7 @@ public class AirportResponseDto {
         this.city = city;
     }
 
+    public AirportResponseDto(){}
     
 
 }

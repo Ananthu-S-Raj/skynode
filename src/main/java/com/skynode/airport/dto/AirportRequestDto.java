@@ -30,6 +30,6 @@ public class AirportRequestDto {
         this.city = city;
     }
 
-    public AirportRequestDto(){};
+    public AirportRequestDto(){}
 }
 

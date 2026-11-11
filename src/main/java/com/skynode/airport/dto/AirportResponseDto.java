@@ -12,9 +12,6 @@ public class AirportResponseDto {
     public void setId(Long id) {
         this.id = id;
     }
-        public Long getId(Long id) {
-        return id;
-    }
     public String getName() {
         return name;
     }
@@ -41,6 +38,4 @@ public class AirportResponseDto {
     }
 
     public AirportResponseDto(){}
-    
-
 }

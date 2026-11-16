@@ -1,21 +1,23 @@
 package com.skynode.booking.controller;
 
-import com.skynode.booking.service.BookingService;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
+
+import jakarta.validation.Valid;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import com.skynode.booking.dto.BookingRequestDto;
 import com.skynode.booking.dto.BookingResponseDto;
-import com.skynode.booking.entity.Booking;
-
-import java.util.List;
-
-import org.springframework.web.bind.annotation.*;
-
-import static org.springframework.http.HttpStatus.*;
-
+import com.skynode.booking.service.BookingService;
 
 @Tag(name = "booking")
 @RestController
@@ -28,66 +30,31 @@ public class BookingController {
         this.bookingService = bookingService;
     }
 
-    @Operation(
-        summary = "Create a booking",
-        description = "Create a new booking for a flight and seat",
-        responses = {
-            @ApiResponse(responseCode = "201", description = "Booking created successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid booking details"),
-            @ApiResponse(responseCode = "409", description = "Booking conflict - seat already booked or seat not on aircraft")
-        }
-    )
+    @Operation(summary = "Create a booking")
     @PostMapping
-    public BookingResponseDto createBooking(@RequestBody BookingRequestDto bookingRequestDto) {
+    public BookingResponseDto createBooking(@Valid @RequestBody BookingRequestDto bookingRequestDto) {
         return bookingService.createBooking(bookingRequestDto);
     }
 
-    @Operation(
-        summary = "Get a booking by ID",
-        description = "Retrieve a booking by its unique identifier",
-        responses = {
-            @ApiResponse(responseCode = "200", description = "Booking retrieved successfully"),
-            @ApiResponse(responseCode = "404", description = "Booking not found")
-        }
-    )
+    @Operation(summary = "Get a booking by ID")
     @GetMapping("/{id}")
     public BookingResponseDto getBookingById(@PathVariable Long id) {
         return bookingService.getBookingById(id);
     }
 
-    @Operation(
-        summary = "Get a booking by PNR",
-        description = "Retrieve a booking by its PNR code",
-        responses = {
-            @ApiResponse(responseCode = "200", description = "Booking retrieved successfully"),
-            @ApiResponse(responseCode = "404", description = "Booking not found")
-        }
-    )
+    @Operation(summary = "Get a booking by PNR")
     @GetMapping("/pnr/{pnr}")
     public BookingResponseDto getBookingByPnr(@PathVariable String pnr) {
         return bookingService.getBookingByPnr(pnr);
     }
 
-    @Operation(
-        summary = "Get bookings by passenger",
-        description = "Retrieve all bookings for a given passenger name",
-        responses = {
-            @ApiResponse(responseCode = "200", description = "Successful retrieval of bookings")
-        }
-    )
+    @Operation(summary = "Get bookings by passenger")
     @GetMapping("/passenger/{passengerName}")
     public List<BookingResponseDto> getBookingsByPassenger(@PathVariable String passengerName) {
         return bookingService.getBookingsByPassenger(passengerName);
     }
 
-    @Operation(
-        summary = "Cancel a booking",
-        description = "Cancel an existing booking and release the seat",
-        responses = {
-            @ApiResponse(responseCode = "200", description = "Booking cancelled successfully"),
-            @ApiResponse(responseCode = "409", description = "Booking already cancelled")
-        }
-    )
+    @Operation(summary = "Cancel a booking")
     @PutMapping("/{id}/cancel")
     public BookingResponseDto cancelBooking(@PathVariable Long id) {
         return bookingService.cancelBooking(id);

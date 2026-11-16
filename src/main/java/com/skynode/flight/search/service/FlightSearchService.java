@@ -1,15 +1,15 @@
 package com.skynode.flight.search.service;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import com.skynode.flight.entity.Flight;
 import com.skynode.flight.instance.entity.FlightInstance;
 import com.skynode.flight.instance.repository.FlightInstanceRepository;
-import com.skynode.flight.search.dto.FlightSearchResultDto;
 import com.skynode.flight.search.dto.FlightSearchRequestDto;
+import com.skynode.flight.search.dto.FlightSearchResultDto;
 import com.skynode.seat.repository.FlightSeatRepository;
 
 @Service
@@ -25,46 +25,35 @@ public class FlightSearchService {
     }
 
     public List<FlightSearchResultDto> search(FlightSearchRequestDto request) {
-        String datePattern = "%" + request.getDepartureDate() + "%";
+        String datePattern = request.getDepartureDate() == null || request.getDepartureDate().isBlank()
+            ? "%" : request.getDepartureDate() + "%";
 
         List<FlightInstance> instances = flightInstanceRepository.findByDepartureDate(datePattern);
 
-        return instances.stream()
-            .filter(instance -> matchesOriginAndDestination(instance, request))
-            .map(instance -> {
-                Flight flight = instance.getFlight();
-                long availableSeatCount = countAvailableSeats(instance);
+        List<FlightSearchResultDto> results = new ArrayList<>();
+        for (FlightInstance instance : instances) {
+            Flight flight = instance.getFlight();
+            if (request.getOriginAirportId() != null
+                    && !request.getOriginAirportId().equals(flight.getOrigin().getId())) {
+                continue;
+            }
+            if (request.getDestinationAirportId() != null
+                    && !request.getDestinationAirportId().equals(flight.getDestination().getId())) {
+                continue;
+            }
 
-                return new FlightSearchResultDto(
-                    flight.getFlightNumber(),
-                    flight.getAirline().getName(),
-                    flight.getOrigin().getName(),
-                    flight.getDestination().getName(),
-                    instance.getDepartureDateTime(),
-                    instance.getArrivalDateTime(),
-                    instance.getStatus(),
-                    availableSeatCount
-                );
-            })
-            .collect(Collectors.toList());
-    }
-
-    private boolean matchesOriginAndDestination(FlightInstance instance, FlightSearchRequestDto request) {
-        Long originId = request.getOriginAirportId();
-        Long destinationId = request.getDestinationAirportId();
-
-        if (originId == null || destinationId == null) {
-            return true;
+            long availableSeats = flightSeatRepository.countByFlightInstanceAndStatus(instance, "AVAILABLE");
+            results.add(new FlightSearchResultDto(
+                flight.getFlightNumber(),
+                flight.getAirline().getName(),
+                flight.getOrigin().getName(),
+                flight.getDestination().getName(),
+                instance.getDepartureDateTime(),
+                instance.getArrivalDateTime(),
+                instance.getStatus(),
+                availableSeats
+            ));
         }
-
-        Long instanceOriginId = instance.getFlight().getOrigin().getId();
-        Long instanceDestinationId = instance.getFlight().getDestination().getId();
-
-        return originId.equals(instanceOriginId) && destinationId.equals(instanceDestinationId);
-    }
-
-    private long countAvailableSeats(FlightInstance flightInstance) {
-        // Count AVAILABLE FlightSeat entities for this flight instance
-        return flightSeatRepository.countByFlightInstanceAndStatus(flightInstance, "AVAILABLE");
+        return results;
     }
 }

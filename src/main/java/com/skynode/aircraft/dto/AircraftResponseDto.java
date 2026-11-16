@@ -42,12 +42,6 @@ public class AircraftResponseDto {
     public AircraftResponseDto() {
     }
 
-    public AircraftResponseDto(Long id, String model, String registrationNumber) {
-        this.id = id;
-        this.model = model;
-        this.registrationNumber = registrationNumber;
-    }
-
     public AircraftResponseDto(Long id, String model, String registrationNumber, String airlineName) {
         this.id = id;
         this.model = model;

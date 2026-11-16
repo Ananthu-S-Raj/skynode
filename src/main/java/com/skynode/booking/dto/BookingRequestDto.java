@@ -1,9 +1,18 @@
 package com.skynode.booking.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+
 public class BookingRequestDto {
 
+    @NotBlank
     private String passengerName;
+    @NotNull
+    @Positive
     private Long flightInstanceId;
+    @NotNull
+    @Positive
     private Long seatId;
 
     public String getPassengerName() {

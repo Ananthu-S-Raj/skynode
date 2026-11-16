@@ -1,11 +1,24 @@
 package com.skynode.flight.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+
 public class FlightRequestDto {
 
+    @NotNull
+    @Positive
     private Long airlineId;
+    @NotNull
+    @Positive
     private Long originAirportId;
+    @NotNull
+    @Positive
     private Long destinationAirportId;
+    @NotNull
+    @Positive
     private Long aircraftId;
+    @NotBlank
     private String flightNumber;
 
     public Long getAirlineId() {

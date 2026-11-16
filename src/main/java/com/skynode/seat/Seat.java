@@ -7,11 +7,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 import com.skynode.aircraft.entity.Aircraft;
 
 @Entity
-@Table(name = "seats")
+@Table(name = "seats", uniqueConstraints = {
+    @UniqueConstraint(name = "uk_aircraft_seat_number", columnNames = {"aircraft_id", "seat_number"})
+})
 public class Seat {
 
     @Id

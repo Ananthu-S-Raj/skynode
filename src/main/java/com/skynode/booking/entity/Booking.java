@@ -1,6 +1,8 @@
 
 package com.skynode.booking.entity;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -8,7 +10,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
 
 import com.skynode.flight.instance.entity.FlightInstance;
 import com.skynode.seat.Seat;
@@ -26,6 +27,13 @@ public class Booking {
 
     @Column(nullable = false)
     private String passengerName;
+
+    private String passengerEmail;
+    private String passengerPhone;
+    private Integer passengerAge;
+    private String passengerGender;
+    private Integer totalAmount;
+    private String paymentStatus;
 
     @ManyToOne(optional = false)
     private FlightInstance flightInstance;
@@ -45,12 +53,12 @@ public class Booking {
 
     public Booking(String pnr, String passengerName,
                    FlightInstance flightInstance, Seat seat) {
+        this();
         this.pnr = pnr;
         this.passengerName = passengerName;
         this.flightInstance = flightInstance;
         this.seat = seat;
         this.status = "CONFIRMED";
-        this.bookingTimestamp = LocalDateTime.now();
     }
 
     public Long getId() {
@@ -76,6 +84,19 @@ public class Booking {
     public void setPassengerName(String passengerName) {
         this.passengerName = passengerName;
     }
+
+    public String getPassengerEmail() { return passengerEmail; }
+    public void setPassengerEmail(String value) { passengerEmail = value; }
+    public String getPassengerPhone() { return passengerPhone; }
+    public void setPassengerPhone(String value) { passengerPhone = value; }
+    public Integer getPassengerAge() { return passengerAge; }
+    public void setPassengerAge(Integer value) { passengerAge = value; }
+    public String getPassengerGender() { return passengerGender; }
+    public void setPassengerGender(String value) { passengerGender = value; }
+    public Integer getTotalAmount() { return totalAmount; }
+    public void setTotalAmount(Integer value) { totalAmount = value; }
+    public String getPaymentStatus() { return paymentStatus; }
+    public void setPaymentStatus(String value) { paymentStatus = value; }
 
     public FlightInstance getFlightInstance() {
         return flightInstance;

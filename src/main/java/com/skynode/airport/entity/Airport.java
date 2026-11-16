@@ -1,6 +1,5 @@
 package com.skynode.airport.entity;
 
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -58,5 +57,7 @@ public class Airport {
         this.country = country;
         this.city = city;
     }
-public Airport(){}
+
+    public Airport() {
+    }
 }

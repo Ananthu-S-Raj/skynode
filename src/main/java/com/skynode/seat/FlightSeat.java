@@ -10,7 +10,6 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
 import com.skynode.flight.instance.entity.FlightInstance;
-import com.skynode.seat.Seat;
 
 @Entity
 @Table(name = "flight_seats", uniqueConstraints = {

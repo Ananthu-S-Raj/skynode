@@ -1,18 +1,23 @@
 package com.skynode.airline.controller;
 
-import com.skynode.airline.dto.AirlineRequestDto;
-import com.skynode.airline.dto.AirlineResponseDto;
-import com.skynode.airline.entity.Airline;
-import com.skynode.airline.repository.AirlineRepository;
-import com.skynode.airline.service.AirlineService;
+import java.util.List;
+
+import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
-import org.springframework.web.bind.annotation.*;
-
+import com.skynode.airline.dto.AirlineRequestDto;
+import com.skynode.airline.dto.AirlineResponseDto;
+import com.skynode.airline.service.AirlineService;
 
 @RestController
 @RequestMapping("/api/v1/airlines")
@@ -25,7 +30,7 @@ public class AirlineController {
     }
 
     @PostMapping
-    public ResponseEntity<AirlineResponseDto> createAirline(@RequestBody AirlineRequestDto airlineRequestDto) {
+    public ResponseEntity<AirlineResponseDto> createAirline(@Valid @RequestBody AirlineRequestDto airlineRequestDto) {
         AirlineResponseDto created = airlineService.createAirline(airlineRequestDto);
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
@@ -41,7 +46,7 @@ public class AirlineController {
     }
 
     @PutMapping("/{id}")
-    public AirlineResponseDto updateAirline(@PathVariable Long id, @RequestBody AirlineRequestDto airlineRequestDto) {
+    public AirlineResponseDto updateAirline(@PathVariable Long id, @Valid @RequestBody AirlineRequestDto airlineRequestDto) {
         return airlineService.updateAirline(id, airlineRequestDto);
     }
 

@@ -1,22 +1,22 @@
 package com.skynode.airline.service;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.skynode.ResourceNotFoundException;
 import com.skynode.airline.dto.AirlineRequestDto;
 import com.skynode.airline.dto.AirlineResponseDto;
 import com.skynode.airline.entity.Airline;
 import com.skynode.airline.repository.AirlineRepository;
-import com.skynode.ResourceNotFoundException;
 
 @Service
 public class AirlineService {
 
     private final AirlineRepository airlineRepository;
 
-    AirlineService(AirlineRepository airlineRepository) {
+    public AirlineService(AirlineRepository airlineRepository) {
         this.airlineRepository = airlineRepository;
     }
 
@@ -27,24 +27,15 @@ public class AirlineService {
 
         Airline savedAirline = airlineRepository.save(airline);
 
-        return new AirlineResponseDto(
-            savedAirline.getId(),
-            savedAirline.getName(),
-            savedAirline.getCode()
-        );
+        return toResponse(savedAirline);
     }
 
     public List<AirlineResponseDto> getAllAirlines() {
         List<Airline> airlines = airlineRepository.findAll();
-        List<AirlineResponseDto> response = new java.util.ArrayList<>();
+        List<AirlineResponseDto> response = new ArrayList<>();
 
         for (Airline airline : airlines) {
-            AirlineResponseDto dto = new AirlineResponseDto(
-                airline.getId(),
-                airline.getName(),
-                airline.getCode()
-            );
-            response.add(dto);
+            response.add(toResponse(airline));
         }
 
         return response;
@@ -54,11 +45,7 @@ public class AirlineService {
         Airline airline = airlineRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Airline with id " + id + " not found"));
 
-        return new AirlineResponseDto(
-            airline.getId(),
-            airline.getName(),
-            airline.getCode()
-        );
+        return toResponse(airline);
     }
 
     public AirlineResponseDto updateAirline(Long id, AirlineRequestDto request) {
@@ -70,16 +57,20 @@ public class AirlineService {
 
         Airline updatedAirline = airlineRepository.save(airline);
 
-        return new AirlineResponseDto(
-            updatedAirline.getId(),
-            updatedAirline.getName(),
-            updatedAirline.getCode()
-        );
+        return toResponse(updatedAirline);
     }
 
     public void deleteAirline(Long id) {
         Airline airline = airlineRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Airline with id " + id + " not found."));
         airlineRepository.delete(airline);
+    }
+
+    private AirlineResponseDto toResponse(Airline airline) {
+        return new AirlineResponseDto(
+            airline.getId(),
+            airline.getName(),
+            airline.getCode()
+        );
     }
 }

@@ -1,8 +1,12 @@
 package com.skynode.airline.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class AirlineRequestDto {
 
+    @NotBlank
     private String name;
+    @NotBlank
     private String code;
 
     public String getName() {

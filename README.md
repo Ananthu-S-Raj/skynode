@@ -1,162 +1,75 @@
-# SkyNode - Flight Booking System Backend
+# SkyNode — Flight Booking System
 
-## Project Overview
+SkyNode is a portfolio flight-booking application with a Spring Boot API, a React frontend, and a persistent, embedded H2 database. Visitors can search scheduled flights, choose a seat, complete a **demo** checkout, retrieve a booking by PNR, and cancel it. An administrator manages airports, airlines, aircraft, seats, flights, and schedules.
 
-SkyNode is a complete Spring Boot REST backend for a flight booking system. It implements a full MVC workflow from airport management through flight search and seat booking.
+## Stack and structure
 
-## Technology Stack
+| Area | Technology |
+| --- | --- |
+| API | Java 21, Spring Boot 4.1.1, Spring Data JPA, Hibernate, Maven |
+| Security | Spring Security, BCrypt, server sessions, CSRF |
+| Database | File-based H2 for local use; isolated in-memory H2 for tests |
+| Web | React 19, Vite 7, JavaScript, CSS, Fetch API |
 
-- **Java**: 21
-- **Spring Boot**: 4.1.1
-- **Maven**: Build tool
-- **PostgreSQL**: Database
-- **Spring Data JPA**: ORM layer
-- **Hibernate**: JPA implementation
-- **Springdoc-openapi**: API documentation
-
-## Project Structure
-
-Organized by domain module:
-
-- `com.skynode.airport` - Airport management
-- `com.skynode.airline` - Airline management
-- `com.skynode.aircraft` - Aircraft management
-- `com.skynode.seat` - Aircraft seat configuration
-- `com.skynode.flight` - Flight management
-- `com.skynode.flight.instance` - Flight instance scheduling
-- `com.skynode.flight.search` - Flight search functionality
-- `com.skynode.booking` - Booking and PNR management
+The backend follows controller → service → repository → entity. `Flight` defines a route and aircraft; `FlightInstance` defines a scheduled departure. `Seat` configures an aircraft; `FlightSeat` tracks availability on a departure. See [architecture](docs/ARCHITECTURE.md) and the [API reference](docs/API.md).
 
 ## Prerequisites
 
-- Java 21 JDK
-- Apache Maven 3.9+
-- PostgreSQL 13+ running with `skynode` database
-- `SKYNODE_DB_PASSWORD` environment variable set
+- Java 21. The included Maven wrapper (`./mvnw`) downloads Maven if needed.
+- Node.js 22.12 or newer and pnpm 11.25.0 for the frontend. If pnpm is missing, install that version with `npm install -g pnpm@11.25.0`.
+- No PostgreSQL or external database server.
 
-## Database Setup
+## Local setup
 
-1. Start PostgreSQL
-2. Create database: `CREATE DATABASE skynode;`
-3. Create user: `CREATE USER skynode_user WITH PASSWORD 'your_password';`
-4. Grant privileges: `GRANT ALL PRIVILEGES ON DATABASE skynode TO skynode_user;`
-5. Set the password environment variable: `export SKYNODE_DB_PASSWORD=your_password`
-
-## Application Configuration
-
-The application configuration is in `src/main/resources/application.properties`:
-
-- `spring.datasource.url=jdbc:postgresql://localhost:5432/skynode`
-- `spring.datasource.username=skynode_user`
-- `spring.datasource.password=${SKYNODE_DB_PASSWORD}`
-- `spring.jpa.hibernate.ddl-auto=update` (automatically creates/update tables)
-
-## API Endpoint Summary
-
-### Airport Module (`/api/v1/airports`)
-
-- `GET /` - Get all airports
-- `GET /{id}` - Get airport by ID
-- `POST /` - Create airport
-- `DELETE /{id}` - Delete airport
-
-### Airline Module (`/api/v1/airlines`)
-
-- `GET /` - Get all airlines
-- `GET /{id}` - Get airline by ID
-- `POST /` - Create airline
-- `PUT /{id}` - Update airline
-- `DELETE /{id}` - Delete airline
-
-### Aircraft Module (`/api/v1/aircraft`)
-
-- `GET /` - Get all aircraft
-- `GET /{id}` - Get aircraft by ID
-- `POST /` - Create aircraft (requires `airlineId` query param)
-- `PUT /{id}` - Update aircraft (requires `airlineId` query param)
-- `DELETE /{id}` - Delete aircraft
-
-### Aircraft Seat Configuration (`/api/v1/aircraft/{id}/seats`)
-
-- `POST /` - Add seats to aircraft (requires seat numbers and class)
-- `GET /` - Get all seats for aircraft
-- `GET /{seatNumber}` - Get individual seat
-
-### Flight Module (`/api/v1/flights`)
-
-- `GET /` - Get all flights
-- `GET /{id}` - Get flight by ID
-- `POST /` - Create flight (validates origin != destination)
-- `PUT /{id}` - Update flight
-- `DELETE /{id}` - Delete flight
-
-### Flight Instance (`/api/v1/flight-instances`)
-
-- `POST /` - Schedule flight instance (requires `flightId` query param)
-- `GET /` - Get all flight instances
-- `GET /{id}` - Get flight instance by ID
-- `GET /flight/{flightId}` - Get instances for a flight
-- `PUT /{id}` - Update flight instance
-- `PUT /{id}/status` - Update flight instance status
-
-### Flight Search (`/api/v1/flights/search`)
-
-- `GET ?originAirportId=&destinationAirportId=&departureDate=` - Search flights
-
-### Booking (`/api/v1/bookings`)
-
-- `POST /` - Create booking (requires passengerName, flightInstanceId, seatId)
-- `GET /{id}` - Get booking by ID
-- `GET /pnr/{pnr}` - Get booking by PNR
-- `GET /passenger/{passengerName}` - Get bookings by passenger
-- `PUT /{id}/cancel` - Cancel booking
-
-## Domain Model Relationships
-
-```
-Airport (1) -- (*) Flight
-Airline (1) -- (*) Aircraft
-Aircraft (1) -- (*) Seat
-Aircraft (1) -- (*) FlightInstance
-Flight (1) -- (*) FlightInstance
-FlightInstance (1) -- (*) FlightSeat
-FlightSeat (1) -- (*) Booking
-Seat (1) -- (*) FlightSeat
-```
-
-## Key Business Rules
-
-1. **Duplicate prevention**: Airline codes, aircraft registration numbers, and seat numbers within an aircraft must be unique
-2. **Origin/destination validation**: Flights cannot have the same origin and destination airport
-3. **Seat availability**: Seats can only be booked when AVAILABLE; booking transitions FlightSeat status to BOOKED
-4. **Cancellation**: Cancelling a booking releases the seat back to AVAILABLE status
-5. **PNR uniqueness**: Each booking receives a unique Passenger Name Record (8-character uppercase alphanumeric)
-6. **Aircraft-seat-flight consistency**: A booking's seat must belong to the aircraft assigned to the flight instance
-
-## Implementation Modules (in order)
-
-1. Airport - CRUD operations with validation
-2. Airline - CRUD with unique code enforcement
-3. Aircraft - CRUD with airline relationship
-4. Seat Configuration - Add seats to aircraft, prevent duplicate seat numbers
-5. Flight - CRUD with origin/destination validation
-6. FlightInstance - Schedule instances, initialize seat availability
-7. Flight Search - Search by origin, destination, and date
-8. Booking - Create bookings with PNR, cancel and release seats
-
-## Build & Run
+From the repository root:
 
 ```bash
-# Compile
-mvn compile
-
-# Run
-mvn spring-boot:run
-
-# Tests (requires PostgreSQL)
-mvn test
+./scripts/setup-admin.sh
+./mvnw spring-boot:run
 ```
 
-$env:SKYNODE_TEST_DB_PASSWORD="your_actual_test_db_password"
+`setup-admin.sh` prompts for the administrator email and a hidden password, hashes it with BCrypt, and writes only the email and hash to ignored `.env.admin`. Run it once on a fresh clone; it does not overwrite an existing account. Alternatively, set `SKYNODE_ADMIN_EMAIL` and `SKYNODE_ADMIN_PASSWORD_HASH` in your environment. The application fails to start without a valid admin configuration. Never commit the hash or plaintext password. See [admin authentication](AUTHENTICATION.md).
 
-if ($env:SKYNODE_TEST_DB_PASSWORD) { "SKYNODE_TEST_DB_PASSWORD is SET" } else { "SKYNODE_TEST_DB_PASSWORD is MISSING" }
+In another terminal:
+
+```bash
+cd frontend
+pnpm install --frozen-lockfile
+pnpm dev
+```
+
+Open [SkyNode](http://localhost:5173). The Vite proxy sends `/api` requests to `http://127.0.0.1:8080` by default. Copy [frontend/.env.example](frontend/.env.example) to `frontend/.env.local` only when changing `VITE_API_BASE_URL` or `BACKEND_PROXY_TARGET`; keep `VITE_API_BASE_URL` relative for same-origin cookies. The API runs at [localhost:8080](http://localhost:8080/health), with [Swagger UI](http://localhost:8080/swagger-ui.html) and [OpenAPI JSON](http://localhost:8080/api-docs).
+
+The Maven run goal activates the `local` Spring profile automatically. A packaged application does **not** inherit that profile. `local` enables the [H2 console](http://localhost:8080/h2-console), which requires the admin session; keep the frontend running on `localhost:5173` for its login redirect. Use JDBC URL `jdbc:h2:file:./data/skynode;DB_CLOSE_ON_EXIT=FALSE`, user `sa`, and an empty H2 password. Console access is disabled outside `local`.
+
+## Booking flow
+
+Search by route and date → choose a scheduled flight and configured seat → enter passenger details → enter correctly formatted **dummy** card fields → enter any four-digit demo OTP → receive the backend booking and PNR. The card number and CVV remain in the browser and are cleared after the demo step. No charge or SMS/email is sent. The booking is created after OTP verification; it uses a fixed demo amount of ₹4,999. PNR lookup and cancellation remain public, with CSRF protection on writes. The legacy direct `POST /api/v1/bookings` API remains available.
+
+Individual booked seats are not exposed before checkout: the seat map shows configured seats and an aggregate available count. The backend locks the selected flight-seat row when booking and rejects a seat that is no longer available.
+
+## Database and optional data
+
+The main database is `data/skynode.mv.db` relative to the repository root. It persists across restarts; `spring.jpa.hibernate.ddl-auto=update` is configured. Do not delete the file. Stop the application before copying it for a backup. Database files, backups, and local credentials are Git-ignored. Tests use separate databases.
+
+A fresh database starts empty. After creating the admin account and starting the backend, `python3 scripts/seed_demo_data.py` can add **optional** fictional airports, airlines, aircraft, seats, flights, and schedules through the existing API. It prompts for the admin password without echoing it. It does not create bookings by default. PostgreSQL records are not automatically imported.
+
+## Tests
+
+```bash
+./mvnw clean test
+cd frontend
+pnpm test
+pnpm test:render
+pnpm build
+```
+
+The backend integration tests cover public and admin HTTP access, CSRF, H2 console policy, scheduling, seat constraints, booking, cancellation, and concurrency. The frontend tests cover API requests and static route rendering. See [FINAL_AUDIT_REPORT.md](FINAL_AUDIT_REPORT.md) for actual results and verification limits.
+
+## Screenshots
+
+Current application screenshots should be added to `docs/SCREENSHOTS/` only after checking that they contain no credentials, tokens, or passenger data. No reference mockups are presented as application screenshots.
+
+## Limitations
+
+This is a learning project, not a production booking or payment service. The payment and OTP steps are simulated. A PNR or booking ID currently grants public access to booking details and cancellation, so avoid real passenger data or public deployment without a stronger passenger authorization design. A static frontend deployment needs a same-origin `/api` proxy; the Vite proxy is for development and preview. See the [audit report](FINAL_AUDIT_REPORT.md) for other findings.

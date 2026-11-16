@@ -11,6 +11,31 @@ public class BookingResponseDto {
     private String seatNumber;
     private String status;
     private String bookingTimestamp;
+    private String passengerEmail;
+    private String passengerPhone;
+    private Integer passengerAge;
+    private String passengerGender;
+    private Integer totalAmount;
+    private String paymentStatus;
+    private String departureDateTime;
+    private String arrivalDateTime;
+
+    public String getDepartureDateTime() { return departureDateTime; }
+    public void setDepartureDateTime(String value) { departureDateTime = value; }
+    public String getArrivalDateTime() { return arrivalDateTime; }
+    public void setArrivalDateTime(String value) { arrivalDateTime = value; }
+    public String getPassengerEmail() { return passengerEmail; }
+    public void setPassengerEmail(String value) { passengerEmail = value; }
+    public String getPassengerPhone() { return passengerPhone; }
+    public void setPassengerPhone(String value) { passengerPhone = value; }
+    public Integer getPassengerAge() { return passengerAge; }
+    public void setPassengerAge(Integer value) { passengerAge = value; }
+    public String getPassengerGender() { return passengerGender; }
+    public void setPassengerGender(String value) { passengerGender = value; }
+    public Integer getTotalAmount() { return totalAmount; }
+    public void setTotalAmount(Integer value) { totalAmount = value; }
+    public String getPaymentStatus() { return paymentStatus; }
+    public void setPaymentStatus(String value) { paymentStatus = value; }
 
     public Long getId() {
         return id;

@@ -1,0 +1,1 @@
+Add screenshots captured from the current running application only after removing personal information, credentials, session tokens, and database details. Reference mockups are not application screenshots.

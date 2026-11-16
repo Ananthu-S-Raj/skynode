@@ -1,8 +1,12 @@
 package com.skynode.aircraft.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class AircraftRequestDto {
 
+    @NotBlank
     private String model;
+    @NotBlank
     private String registrationNumber;
 
     public String getModel() {

@@ -9,6 +9,8 @@ import com.skynode.seat.Seat;
 
 public interface SeatRepository extends JpaRepository<Seat, Long> {
 
+    boolean existsByAircraftIdAndSeatNumber(Long aircraftId, String seatNumber);
+
     Seat findByAircraftAndSeatNumber(Aircraft aircraft, String seatNumber);
 
     List<Seat> findByAircraft(Aircraft aircraft);
